@@ -1,0 +1,40 @@
+{
+    "basketball": [
+        "Lakers", "Celtics", "Warriors", "Heat", "Nets", "Bulls", "Bucks", "Suns",
+        "Nuggets", "Clippers", "Mavericks", "76ers", "Knicks", "Raptors", "Spurs", "Rockets",
+        "Jazz", "Trail Blazers", "Hawks", "Cavaliers", "Grizzlies", "Pelicans", "Kings", "Timberwolves",
+        "Magic", "Wizards", "Hornets", "Pistons", "Pacers", "Thunder", "Blazers", "Hornets",
+        "Real Madrid", "Barcelona", "CSKA Moscow", "Fenerbahce", "Olympiacos", "Panathinaikos",
+        "Zalgiris", "Maccabi Tel Aviv", "Anadolu Efes", "Bayern Munich", "Valencia", "Baskonia",
+        "Milano", "Virtus Bologna", "Monaco", "Alba Berlin", "Partizan", "Red Star", "Unicaja",
+        "Gran Canaria", "Zenit", "Khimki", "Lokomotiv", "UNICS Kazan", "Melbourne United",
+        "Sydney Kings", "Perth Wildcats", "Adelaide 36ers", "New Zealand Breakers"
+    ],
+    "judo": [
+        "Teddy Riner", "Ono Shohei", "Lukasz Krpalek", "Ilias Iliadis", "Takato Naohisa", "Daria Bilodid",
+        "Clarisse Agbegnenou", "Nora Gjakova", "Idalys Ortiz", "Mayra Aguiar", "Distria Krasniqi",
+        "Amandine Buchard", "Christa Deguchi", "Lasha Bekauri", "Matthias Casse", "Saeid Mollaei",
+        "Sagi Muki", "Akil Gjakova", "Nikoloz Sherazadishvili", "Hifumi Abe", "Uta Abe",
+        "Maruyama Joshiro", "Tina Trstenjak", "Marie Eve Gahie", "Kim Polling", "Fabio Basile",
+        "Manuel Lombardo", "Odette Giuffrida", "Maria Centracchio", "Alice Bellandi", "Christian Parlati",
+        "Shori Hamada", "Akira Sone", "Aaron Wolf", "Takanori Nagase", "Naohisa Takato",
+        "Chizuru Arai", "Natsumi Tsunoda", "Tsukasa Yoshida", "Kayla Harrison", "Travis Stevens",
+        "Angelica Delgado", "Marti Malloy", "Nick Delpopolo", "Kayla Harrison", "Flavio Canto",
+        "Leandro Guilheiro", "Sarah Menezes", "Rafaela Silva", "Automne Pavia", "Laetitia Payet",
+        "Loic Korval", "Axel Clerget", "David Larose", "Walide Khyar", "Margaux Pinot"
+    ],
+    "cricket": [
+        "India", "Australia", "England", "Pakistan", "New Zealand", "South Africa",
+        "West Indies", "Sri Lanka", "Bangladesh", "Afghanistan", "Zimbabwe", "Ireland",
+        "Netherlands", "Scotland", "UAE", "Oman", "Nepal", "USA", "Canada", "Kenya",
+        "Mumbai Indians", "Chennai Super Kings", "Royal Challengers Bangalore", "Kolkata Knight Riders",
+        "Delhi Capitals", "Punjab Kings", "Rajasthan Royals", "Sunrisers Hyderabad",
+        "Gujarat Titans", "Lucknow Super Giants", "Sydney Sixers", "Melbourne Stars",
+        "Perth Scorchers", "Adelaide Strikers", "Brisbane Heat", "Hobart Hurricanes",
+        "Sydney Thunder", "Melbourne Renegades", "Jamaica Tallawahs", "Trinbago Knight Riders",
+        "Barbados Royals", "St Lucia Kings", "Guyana Amazon Warriors", "St Kitts and Nevis Patriots",
+        "Lahore Qalandars", "Karachi Kings", "Islamabad United", "Peshawar Zalmi",
+        "Multan Sultans", "Quetta Gladiators", "Dhaka Platoon", "Chittagong Vikings",
+        "Rangpur Riders", "Comilla Victorians", "Rajshahi Royals", "Sylhet Sixers"
+    ]
+}
