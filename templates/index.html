@@ -359,7 +359,6 @@
                 <button class="filter-btn" data-filter="live">🔴 Live</button>
                 <button class="filter-btn" data-filter="basketball">🏀 Basketball</button>
                 <button class="filter-btn" data-filter="judo">🥋 Judo</button>
-                <button class="filter-btn" data-filter="cricket">🏏 Cricket</button>
             </div>
         </header>
 
@@ -386,15 +385,15 @@
 
         function connectWebSocket() {
             ws = new WebSocket('ws://localhost:8888/ws');
-            
+
             ws.onopen = () => {
                 console.log('WebSocket connected');
                 updateConnectionStatus(true);
             };
-            
+
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                
+
                 if (data.type === 'init') {
                     matches = data.matches;
                     renderMatches();
@@ -404,12 +403,12 @@
                         if (index !== -1) {
                             const oldMatch = matches[index];
                             matches[index] = updatedMatch;
-                            
+
                             // Notifica per nuovi eventi
                             if (updatedMatch.events.length > oldMatch.events.length) {
                                 playNotificationSound();
                             }
-                            
+
                             // Aggiorna vista dettaglio se aperta
                             if (currentDetailMatch === updatedMatch.id) {
                                 renderDetail(updatedMatch);
@@ -419,12 +418,12 @@
                     renderMatches();
                 }
             };
-            
+
             ws.onerror = (error) => {
                 console.error('WebSocket error:', error);
                 updateConnectionStatus(false);
             };
-            
+
             ws.onclose = () => {
                 console.log('WebSocket disconnected');
                 updateConnectionStatus(false);
@@ -450,8 +449,7 @@
         function getSportIcon(sport) {
             const icons = {
                 basketball: '🏀',
-                judo: '🥋',
-                cricket: '🏏'
+                judo: '🥋'
             };
             return icons[sport] || '🏆';
         }
@@ -473,8 +471,6 @@
                 const minutes = Math.floor(match.time / 60);
                 const seconds = match.time % 60;
                 return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            } else if (match.sport === 'cricket') {
-                return `${match.overs}.${match.balls} overs`;
             }
             return `${match.time}'`;
         }
@@ -486,8 +482,6 @@
                 let details = `Wazari: ${match.wazariHome}-${match.wazariAway} | Shido: ${match.shidoHome}-${match.shidoAway}`;
                 if (match.ippon) details += ' | IPPON!';
                 return details;
-            } else if (match.sport === 'cricket') {
-                return `Innings ${match.innings} | Wickets: ${match.currentBatting === 'home' ? match.wicketsHome : match.wicketsAway}/10`;
             }
             return '';
         }
@@ -529,7 +523,7 @@
                         <span class="sport-icon">${getSportIcon(match.sport)}</span>
                         ${getStatusBadge(match.status)}
                     </div>
-                    
+
                     <div class="teams">
                         <div class="team-row">
                             <span class="team-name">${match.homeTeam}</span>
@@ -540,14 +534,14 @@
                             <span class="team-score">${match.awayScore}</span>
                         </div>
                     </div>
-                    
+
                     ${match.status !== 'scheduled' ? `
                         <div class="match-info">
                             <div class="time-display">⏱️ ${getTimeDisplay(match)}</div>
                             <div class="recent-events">${getRecentEvents(match)}</div>
                         </div>
                     ` : ''}
-                    
+
                     ${getSportDetails(match) ? `
                         <div class="sport-details">${getSportDetails(match)}</div>
                     ` : ''}
@@ -571,14 +565,14 @@
 
         function renderDetail(match) {
             const detailBody = document.getElementById('detailBody');
-            
+
             detailBody.innerHTML = `
                 <div style="text-align: center; margin-bottom: 30px;">
                     <span style="font-size: 4em;">${getSportIcon(match.sport)}</span>
                     <h2 style="margin: 20px 0;">${match.homeTeam} vs ${match.awayTeam}</h2>
                     ${getStatusBadge(match.status)}
                 </div>
-                
+
                 <div class="teams">
                     <div class="team-row">
                         <span class="team-name">${match.homeTeam}</span>
@@ -589,22 +583,22 @@
                         <span class="team-score">${match.awayScore}</span>
                     </div>
                 </div>
-                
+
                 ${match.status !== 'scheduled' ? `
                     <div style="text-align: center; margin: 20px 0;">
                         <div class="time-display">⏱️ ${getTimeDisplay(match)}</div>
                     </div>
                 ` : ''}
-                
+
                 ${getSportDetails(match) ? `
                     <div class="sport-details" style="text-align: center; font-size: 1.1em;">
                         ${getSportDetails(match)}
                     </div>
                 ` : ''}
-                
+
                 <div class="events-list">
                     <h3 style="margin-bottom: 20px;">📊 Eventi del Match</h3>
-                    ${match.events.length === 0 ? 
+                    ${match.events.length === 0 ?
                         '<p style="text-align: center; color: #888;">Nessun evento ancora</p>' :
                         match.events.slice().reverse().map(event => `
                             <div class="event-item">
@@ -625,8 +619,6 @@
                 const minutes = Math.floor(event.time / 60);
                 const seconds = event.time % 60;
                 return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            } else if (sport === 'cricket') {
-                return `${event.over}.${event.ball}`;
             }
             return `${event.minute}'`;
         }
@@ -641,9 +633,7 @@
                 ippon: '💥',
                 wazari: '⚡',
                 shido: '🟨',
-                wicket: '❌',
                 boundary: event.runs === 6 ? '🎯' : '⭐',
-                run: '🏃',
                 quarter_end: '⏹️',
                 over_complete: '✅'
             };
@@ -666,17 +656,9 @@
             } else if (event.type === 'wazari') {
                 return `<strong>Wazari</strong> per ${event.team === 'home' ? match.homeTeam : match.awayTeam} - ${event.technique}`;
             } else if (event.type === 'shido') {
-                return `<strong>Shido</strong> per ${event.team === 'home' ? match.homeTeam : match.awayTeam} - ${event.reason}`;
-            } else if (event.type === 'wicket') {
-                return `<strong>WICKET!</strong> ${event.batsman} eliminato (${event.wicket_type})`;
-            } else if (event.type === 'boundary') {
-                return `<strong>${event.runs === 6 ? 'SIX!' : 'FOUR!'}</strong> ${event.batsman} segna ${event.runs} run`;
-            } else if (event.type === 'run') {
-                return `${event.batsman} segna ${event.runs} run`;
+                return `<strong>Shido</strong> per ${event.team === 'home' ? match.homeTeam : match.awayTeam} - ${event.reason}`
             } else if (event.type === 'quarter_end') {
                 return `<strong>Fine Quarto ${event.quarter}</strong>`;
-            } else if (event.type === 'over_complete') {
-                return `<strong>Over completato</strong>`;
             }
             return JSON.stringify(event);
         }

@@ -1,4 +1,4 @@
-# server.py - Backend Tornado con Judo, Cricket e Basket
+
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
@@ -30,7 +30,6 @@ def randomize_matches(teams, num_matches):
 def read_json(file):
     with open(file) as f:
         read = json.load(f)
-
     return read
 
 class Match:
@@ -46,7 +45,6 @@ class Match:
         self.events = []
         self.time = 0
 
-        # Parametri specifici per sport
         if sport == 'basketball':
             if status == 'scheduled':
                 self.quarter = 1
@@ -60,29 +58,19 @@ class Match:
 
 
         elif sport == 'judo':
-            self.max_time = 4  # 4 minuti
-            self.time = 0 if status == 'scheduled' else random.randint(0, 180)  # in secondi
+            self.max_time = 4
+            self.time = 0 if status == 'scheduled' else random.randint(0, 180)
             self.ippon = False
             self.wazari_home = 0
             self.wazari_away = 0
             self.shido_home = 0
             self.shido_away = 0
 
-        elif sport == 'cricket':
-            self.innings = 1
-            self.overs = 0
-            self.balls = 0
-            self.max_overs = 20  # T20
-            self.wickets_home = 0
-            self.wickets_away = 0
-            self.current_batting = 'home'
 
-        # Aggiungi eventi iniziali per match live
         if status == 'live':
             self._add_initial_events()
 
     def _add_initial_events(self):
-        """Aggiungi alcuni eventi iniziali per match già iniziati"""
         if self.sport == 'basketball' and self.time > 5:
             self.home_score = random.randint(40, 80)
             self.away_score = random.randint(40, 80)
@@ -103,11 +91,6 @@ class Match:
                 self.shido_home = random.randint(0, 2)
                 self.shido_away = random.randint(0, 2)
 
-        elif self.sport == 'cricket' and self.overs > 0:
-            self.home_score = random.randint(80, 150)
-            self.wickets_home = random.randint(0, 4)
-            self.overs = random.randint(5, 15)
-            self.balls = random.randint(0, 5)
 
     def update(self):
         """Aggiorna lo stato del match"""
@@ -216,13 +199,13 @@ class Match:
                 }
                 self.events.append(event)
 
-            # Shido (penalità)
-            elif random.random() < 0.02:  # 2% probabilità shido
+
+            elif random.random() < 0.02:
                 team = random.choice(['home', 'away'])
 
                 if team == 'home':
                     self.shido_home += 1
-                    if self.shido_home >= 3:  # 3 shido = squalifica
+                    if self.shido_home >= 3:
                         self.away_score = 10
                         self.status = 'finished'
                 else:
@@ -240,93 +223,14 @@ class Match:
                 }
                 self.events.append(event)
 
-            # Fine tempo
-            if self.time >= 240:  # 4 minuti
+
+            if self.time >= 240:
                 self.status = 'finished'
-                # Determina vincitore per punteggio
                 score_home = self.wazari_home * 5
                 score_away = self.wazari_away * 5
                 self.home_score = score_home
                 self.away_score = score_away
 
-        elif self.sport == 'cricket':
-            # Avanza ball
-            self.balls += 1
-
-            # Genera run o wicket
-            if random.random() < 0.75:  # 75% probabilità run
-                runs = random.choices([0, 1, 2, 3, 4, 6], weights=[0.25, 0.30, 0.20, 0.10, 0.10, 0.05])[0]
-
-                if self.current_batting == 'home':
-                    self.home_score += runs
-                else:
-                    self.away_score += runs
-
-                if runs > 0:
-                    event = {
-                        'id': len(self.events) + 1,
-                        'over': self.overs,
-                        'ball': self.balls,
-                        'type': 'boundary' if runs >= 4 else 'run',
-                        'runs': runs,
-                        'team': self.current_batting,
-                        'batsman': f'{self.home_team if self.current_batting == "home" else self.away_team} Batsman {random.randint(1, 11)}'
-                    }
-                    self.events.append(event)
-
-            # Wicket
-            elif random.random() < 0.15:  # 15% probabilità wicket
-                if self.current_batting == 'home':
-                    self.wickets_home += 1
-                else:
-                    self.wickets_away += 1
-
-                wicket_type = random.choice(['bowled', 'caught', 'lbw', 'run out', 'stumped'])
-
-                event = {
-                    'id': len(self.events) + 1,
-                    'over': self.overs,
-                    'ball': self.balls,
-                    'type': 'wicket',
-                    'wicket_type': wicket_type,
-                    'team': self.current_batting,
-                    'batsman': f'{self.home_team if self.current_batting == "home" else self.away_team} Batsman {random.randint(1, 11)}'
-                }
-                self.events.append(event)
-
-                # Fine innings se 10 wicket
-                if (self.current_batting == 'home' and self.wickets_home >= 10) or \
-                        (self.current_batting == 'away' and self.wickets_away >= 10):
-                    if self.innings == 1:
-                        self.innings = 2
-                        self.current_batting = 'away' if self.current_batting == 'home' else 'home'
-                        self.overs = 0
-                        self.balls = 0
-                    else:
-                        self.status = 'finished'
-
-            # Fine over
-            if self.balls >= 6:
-                self.overs += 1
-                self.balls = 0
-
-                event = {
-                    'id': len(self.events) + 1,
-                    'over': self.overs - 1,
-                    'type': 'over_complete',
-                    'team': self.current_batting
-                }
-                self.events.append(event)
-
-                # Fine innings per over completati
-                if self.overs >= self.max_overs:
-                    if self.innings == 1:
-                        self.innings = 2
-                        self.current_batting = 'away' if self.current_batting == 'home' else 'home'
-                        self.overs = 0
-                        self.balls = 0
-                    else:
-                        self.status = 'finished'
 
         return event
 
@@ -355,14 +259,6 @@ class Match:
             data['shidoAway'] = self.shido_away
             data['ippon'] = self.ippon
 
-        elif self.sport == 'cricket':
-            data['innings'] = self.innings
-            data['overs'] = self.overs
-            data['balls'] = self.balls
-            data['maxOvers'] = self.max_overs
-            data['wicketsHome'] = self.wickets_home
-            data['wicketsAway'] = self.wickets_away
-            data['currentBatting'] = self.current_batting
 
         return data
 
@@ -379,7 +275,6 @@ def initialize_matches():
         matches[match_id] = Match(match_id, sport, home, away, status)
 
 
-# Handler WebSocket
 class MatchWebSocket(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
@@ -388,7 +283,6 @@ class MatchWebSocket(tornado.websocket.WebSocketHandler):
         clients.add(self)
         print(f"WebSocket opened. Total clients: {len(clients)}")
 
-        # Invia stato iniziale
         self.write_message(json.dumps({
             'type': 'init',
             'matches': [m.to_dict() for m in matches.values()]
@@ -399,7 +293,7 @@ class MatchWebSocket(tornado.websocket.WebSocketHandler):
         print(f"WebSocket closed. Total clients: {len(clients)}")
 
 
-# Handler HTTP
+
 class MatchesHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
         self.set_header("Access-Control-Allow-Origin", "*")
@@ -434,10 +328,9 @@ class MainHandler(tornado.web.RequestHandler):
         self.render("index.html")
 
 
-# Funzione di aggiornamento periodico
 async def update_matches():
     while True:
-        await asyncio.sleep(2)  # Aggiorna ogni 2 secondi
+        await asyncio.sleep(1)
 
         updates = []
         for match in matches.values():
@@ -477,10 +370,9 @@ if __name__ == "__main__":
     app.listen(8888)
 
     print("🏀 Server started on http://localhost:8888")
-    print("📊 Sports: Basketball, Judo, Cricket")
+    print("📊 Sports: Basketball, Judo")
     print("🔴 Live matches running...")
 
-    # Avvia aggiornamenti periodici
     tornado.ioloop.IOLoop.current().spawn_callback(update_matches)
 
     tornado.ioloop.IOLoop.current().start()
