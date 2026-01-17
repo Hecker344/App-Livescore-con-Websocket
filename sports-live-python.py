@@ -93,7 +93,6 @@ class Match:
 
 
     def update(self):
-        """Aggiorna lo stato del match"""
         if self.status != 'live':
             return None
 
@@ -102,10 +101,15 @@ class Match:
         if self.sport == 'basketball':
             self.time += 1
 
-            # Genera canestri
-            if random.random() < 0.18:  # 18% probabilità canestro
+            if random.random() < 0.18:
                 team = random.choice(['home', 'away'])
                 points = random.choices([2, 3], weights=[0.65, 0.35])[0]
+                player= random.randint(1,15)
+                if team=="home":
+                    teamname=self.home_team
+
+                else:
+                    teamname=self.away_team
 
                 if team == 'home':
                     self.home_score += points
@@ -118,23 +122,28 @@ class Match:
                     'quarter': self.quarter,
                     'type': 'basket',
                     'team': team,
-                    'player': f'{self.home_team if team == "home" else self.away_team} #{random.randint(1, 15)}',
+                    'player': f'{teamname}# {player}',
                     'points': points
                 }
                 self.events.append(event)
 
-            # Eventi speciali basket
+
             elif random.random() < 0.05:
                 event_type = random.choice(['foul', 'timeout', 'steal', 'block'])
                 team = random.choice(['home', 'away'])
+                player = random.randint(1, 15)
+                if team == "home":
+                    teamname = self.home_team
 
+                else:
+                    teamname = self.away_team
                 event = {
                     'id': len(self.events) + 1,
                     'minute': self.time,
                     'quarter': self.quarter,
                     'type': event_type,
                     'team': team,
-                    'player': f'{self.home_team if team == "home" else self.away_team} #{random.randint(1, 15)}'
+                    'player': f'{teamname}# {player}'
                 }
                 self.events.append(event)
 
@@ -235,7 +244,6 @@ class Match:
         return event
 
     def to_dict(self):
-        """Converti match in dizionario"""
         data = {
             'id': self.id,
             'sport': self.sport,
@@ -264,13 +272,9 @@ class Match:
 
 
 def initialize_matches():
-    """Inizializza i match di esempio"""
     global matches
-
     teams = read_json("teams.json")
-
-    matches_data = randomize_matches(teams, 8)
-
+    matches_data = randomize_matches(teams, random.randint(6,15))
     for match_id, sport, home, away, status in matches_data:
         matches[match_id] = Match(match_id, sport, home, away, status)
 
@@ -282,10 +286,12 @@ class MatchWebSocket(tornado.websocket.WebSocketHandler):
     def open(self):
         clients.add(self)
         print(f"WebSocket opened. Total clients: {len(clients)}")
-
+        lista = []
+        for m in matches.values():
+            lista.append(m.to_dict())
         self.write_message(json.dumps({
             'type': 'init',
-            'matches': [m.to_dict() for m in matches.values()]
+            'matches': lista
         }))
 
     def on_close(self):
@@ -295,24 +301,26 @@ class MatchWebSocket(tornado.websocket.WebSocketHandler):
 
 
 class MatchesHandler(tornado.web.RequestHandler):
-    def set_default_headers(self):
-        self.set_header("Access-Control-Allow-Origin", "*")
-        self.set_header("Access-Control-Allow-Methods", "GET, OPTIONS")
-        self.set_header("Access-Control-Allow-Headers", "Content-Type")
+    def set_default_header(self):
+        self.set_header("Content-Type", "application/json")
 
     def options(self):
         self.set_status(204)
         self.finish()
 
     def get(self):
-        self.write(json.dumps({
-            'matches': [m.to_dict() for m in matches.values()]
-        }))
+        matches_list = []
+        for m in matches.values():
+            matches_list.append(m.to_dict())
+        data = {
+            "matches": matches_list
+        }
+        self.write(json.dumps(data))
 
 
 class MatchDetailHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
-        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Content-Type", "application/json")
 
     def get(self, match_id):
         match = matches.get(match_id)
@@ -357,7 +365,7 @@ def make_app():
         (r"/ws", MatchWebSocket),
         (r"/api/matches", MatchesHandler),
         (r"/api/matches/([^/]+)", MatchDetailHandler),
-        (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": "./static"}),
+        (r"/templates/(.*)", tornado.web.StaticFileHandler, {"path": "./templates"}),
     ],
         template_path="./templates",
         debug=True)
