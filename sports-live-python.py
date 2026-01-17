@@ -1,10 +1,8 @@
-
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
 import json
 import random
-from datetime import datetime
 import asyncio
 
 matches = {}
@@ -12,7 +10,7 @@ clients = set()
 
 
 def randomize_matches(teams, num_matches):
-    stati = ['live', 'finished', 'scheduled']
+    stati = ['live', 'scheduled']
     sports = list(teams.keys())
     print(sports)
     matches = []

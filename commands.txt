@@ -1,0 +1,10 @@
+
+Per Costruire l'immagine:
+
+    docker build -t livescore-app .
+
+Per avviare il container:
+
+    docker run -p 8888:8888 livescore-app
+
+

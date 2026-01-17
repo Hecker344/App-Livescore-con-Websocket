@@ -39,7 +39,6 @@
         let matches = [];
         let currentFilter = 'all';
         let currentDetailMatch = null;
-        const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSyAy/LZizcIGGS57OihUBELTKXh8bllHgU2jdXzzn0vBSt+zPLaizsIHGu98+qcTQ0NVKzn77FeFQxIot/yuWohBSqAzvLaizgIG2e68OudTxELTqfj8bhoHwU3kNbz0IAsBSh7y/LbjDwIF2W58Oqg' + 'URALTqbl8rhlHQU3jdXzzn0wBSp+zvLbjTsIG2m88OqdURIMUqvm8LJgGAU5jtbz0H4vBSh7yvLbjTwIGGe68OqgUhELTqfl8rhlHQU3jdX0z38wBSt+zvLbjTsIG2m88OqdURIMUqvm8LJgGAU5jtbz0H4vBSh7yvLbjTwIGGe68OqgUhELTqfl8rhlHQU3jdX0z38wBSt+zvLbjTsIG2m88OqdURIMUqvm8LJgGAU5jtbz0H4vBSh7yvLbjTwI');
 
         function connectWebSocket() {
             ws = new WebSocket('ws://localhost:8888/ws');
@@ -62,12 +61,6 @@
                             const oldMatch = matches[index];
                             matches[index] = updatedMatch;
 
-                            // Notifica per nuovi eventi
-                            if (updatedMatch.events.length > oldMatch.events.length) {
-                                playNotificationSound();
-                            }
-
-                            // Aggiorna vista dettaglio se aperta
                             if (currentDetailMatch === updatedMatch.id) {
                                 renderDetail(updatedMatch);
                             }
@@ -98,10 +91,6 @@
                 status.className = 'connection-status disconnected';
                 status.textContent = '🔴 Disconnesso';
             }
-        }
-
-        function playNotificationSound() {
-            audio.play().catch(e => console.log('Audio play failed:', e));
         }
 
         function getSportIcon(sport) {
@@ -321,7 +310,7 @@
             return JSON.stringify(event);
         }
 
-        // Gestione filtri
+
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -331,12 +320,12 @@
             });
         });
 
-        // Chiudi dettaglio con ESC
+
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeDetail();
         });
 
-        // Avvia connessione
+
         connectWebSocket();
     </script>
 </body>
